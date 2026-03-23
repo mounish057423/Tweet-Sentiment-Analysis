@@ -1,3 +1,24 @@
+# version: "3.9"
+
+# services:
+#   backend:
+#     build:
+#       context: ./backend
+#     container_name: sentiment-backend
+#     ports:
+#       - "8000:8000"
+#     env_file:
+#       - ./backend/.env
+
+#   frontend:
+#     build:
+#       context: ./Front-end
+#     container_name: sentiment-frontend
+#     ports:
+#       - "5173:80"
+#     depends_on:
+#       - backend
+
 version: "3.9"
 
 services:
@@ -9,12 +30,22 @@ services:
       - "8000:8000"
     env_file:
       - ./backend/.env
+    networks:
+      - app-network
 
   frontend:
     build:
       context: ./Front-end
+      args:
+        - VITE_BASE_URL=/        # ← pass directly here!
     container_name: sentiment-frontend
     ports:
       - "5173:80"
     depends_on:
       - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
