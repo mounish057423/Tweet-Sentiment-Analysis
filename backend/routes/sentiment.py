@@ -3,12 +3,28 @@ from fastapi.responses import JSONResponse
 import httpx
 from config import HF_TOKEN, HF_URL, ROBERTA_MODEL_ID, available_models
 from schemas import SentimentRequest
+import os
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 
 router = APIRouter(prefix="/sentiment", tags=["sentiment"])
 
-nltk.download('vader_lexicon', quiet=True)
+# nltk.download('vader_lexicon', quiet=True)
+# sia = SentimentIntensityAnalyzer()
+# Create local nltk_data folder
+nltk_data_path = os.path.join(os.getcwd(), "nltk_data")
+os.makedirs(nltk_data_path, exist_ok=True)
+
+# Tell nltk to use this path
+nltk.data.path.append(nltk_data_path)
+
+# Download if not present
+try:
+    nltk.data.find('sentiment/vader_lexicon.zip')
+except LookupError:
+    nltk.download('vader_lexicon', download_dir=nltk_data_path)
+
+from nltk.sentiment import SentimentIntensityAnalyzer
 sia = SentimentIntensityAnalyzer()
 
 @router.get("/get_models")
